@@ -20,6 +20,7 @@ using namespace std;
 int rowIteration = 0;
 float sigmoide = 2.7182818284590452353602874713527;
 float output = 0.0;
+int counter = 0;
 
 #define rnd() ((double)(rand()) / RAND_MAX) - 0.5
 
@@ -28,6 +29,7 @@ class Neuron {
 	public:
 			float feature[150][4];
 			float labels[150][3];
+			float HIDDENOUTPUTARRAY[450];
 			float Output_errors[3];
 			float Hiddenweights[12];
 			float Outputweights[9];
@@ -132,26 +134,38 @@ int main() {
 /* begin feed forward */
 // 4 input neurons, 3 hidden neurons, 3 output neurons
 // Calculating the Hidden Layer charges
-	for (int i=0; i < 4; i++) {
-		n.Hiddencharge[0] += (n.feature[0][i] * n.Hiddenweights[i]);
-		n.Hiddencharge[1] += (n.feature[0][i] * n.Hiddenweights[i+4]);
-		n.Hiddencharge[2] += (n.feature[0][i] * n.Hiddenweights[i+8]);
-	}
-	for (int i = 0; i < 3; i++)
-		n.Hiddencharge[i] = n.Hiddencharge[i] - n.thetas[i];
-
-	// OUTPUT of Hidden Layer neurons (tilda y)
-	sigmoid(n.Hiddencharge[0]);
-	n.Hiddenoutput[0] = output;
-	sigmoid(n.Hiddencharge[1]);
-	n.Hiddenoutput[1] = output;
-	sigmoid(n.Hiddencharge[2]);
-	n.Hiddenoutput[2] = output;
+			/*----- HIDDEN LAYER ----*/
+	for (int epoch = 0; epoch < 150; epoch++) {
+		for (int i=0; i < 4; i++) {
+			n.Hiddencharge[0] += (n.feature[epoch][i] * n.Hiddenweights[i]);
+			n.Hiddencharge[1] += (n.feature[epoch][i] * n.Hiddenweights[i+4]);
+			n.Hiddencharge[2] += (n.feature[epoch][i] * n.Hiddenweights[i+8]);
+		}
+		for (int i = 0; i < 3; i++) {
+			n.Hiddencharge[i] = n.Hiddencharge[i] - n.thetas[i];
+		}
+		// OUTPUT of Hidden Layer neurons (tilda y)
+		for (int i = 0; i < 3; i++) {
+			sigmoid(n.Hiddencharge[i]);
+			n.HIDDENOUTPUTARRAY[counter] = output;
+			counter++;
+		}
+		//spit out our charges
+		for (int i=0; i < 3; i++)
+			cout << "Hidden Charges: " << n.Hiddencharge[i] << " ";
+		cout << endl;
+	}  // end of epoch.	
+	/*---- FINISHED WITH THE HIDDEN LAYER -----*/
 	
-	cout << "->Hidden Charges: " << n.Hiddencharge[0] << "2: " << n.Hiddencharge[1] << "3: " << n.Hiddencharge[2] << endl;
-	for (int i=0; i < 3; i++)
-		cout << "Hidden outputs: " << n.Hiddenoutput[i] << endl;
-
+		for (int i=0; i < 450; i++) {
+			if (i % 3 == 0) {
+				cout << endl;
+				cout << "---------" << endl;
+			}
+			cout << "Hidden outputs: " << n.HIDDENOUTPUTARRAY[i] << endl;
+		}
+	
+				/*----- OUTPUT LAYER ------*/	
 	// Send our Output of Hidden Layer -> Output Layer
 	for (int i=0; i < 3; i++) {
 		n.Outputcharge[0] += (n.Hiddenoutput[i] * n.Hiddenweights[i]);
