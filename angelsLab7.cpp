@@ -37,10 +37,11 @@ class Neuron {
 			float delta[6];
 			float charge,y,gain,wgain; //gain = -1 (bias). wgain = theta
 			float Hiddencharge[3]; //, Hiddencharge2,Hiddencharge3;
-			float Outputcharge[3]; //]1, Outputcharge2,Outputcharge3;
+			float Outputcharge[3]; //1, Outputcharge2,Outputcharge3;
 			float Hiddenoutput[3];
-			float OUTPUToutput[3];
+			float OUTPUToutput[450];
 	Neuron () {
+			//srand(time(NULL));
 			for (int i=0; i<12; i++)
 					Hiddenweights[i] = rnd();
 
@@ -134,6 +135,7 @@ int main() {
 /* begin feed forward */
 // 4 input neurons, 3 hidden neurons, 3 output neurons
 // Calculating the Hidden Layer charges
+
 			/*----- HIDDEN LAYER ----*/
 	for (int epoch = 0; epoch < 150; epoch++) {
 		for (int i=0; i < 4; i++) {
@@ -153,40 +155,62 @@ int main() {
 		//spit out our charges
 		for (int i=0; i < 3; i++)
 			cout << "Hidden Charges: " << n.Hiddencharge[i] << " ";
-		cout << endl;
-	}  // end of epoch.	
+		cout << endl ; 
+		n.Hiddencharge[0] = 0;
+		n.Hiddencharge[1] = 0;
+		n.Hiddencharge[2] = 0;
+	}  // end of epoch.	 
 	/*---- FINISHED WITH THE HIDDEN LAYER -----*/
-	
+		
+	// spit out hidden layer outputs	
 		for (int i=0; i < 450; i++) {
 			if (i % 3 == 0) {
 				cout << endl;
 				cout << "---------" << endl;
 			}
 			cout << "Hidden outputs: " << n.HIDDENOUTPUTARRAY[i] << endl;
-		}
+		} 
+		cout << "-- End of Hidden Layer --" << endl << endl;
 	
+	// reset Global Counter
+	counter = 0;
+	output = 0.0;
+
 				/*----- OUTPUT LAYER ------*/	
-	// Send our Output of Hidden Layer -> Output Layer
-	for (int i=0; i < 3; i++) {
-		n.Outputcharge[0] += (n.Hiddenoutput[i] * n.Hiddenweights[i]);
-		n.Outputcharge[1] += (n.Hiddenoutput[i] * n.Hiddenweights[i+3]);
-		n.Outputcharge[2] += (n.Hiddenoutput[i] * n.Hiddenweights[i+6]);
-	}
-	for (int i = 0; i < 3; i++)
-		n.Outputcharge[i] = n.Outputcharge[i] - n.thetas[i+3];
-
-	// OUTPUT of Output Layer neurons (tilda y)
-	sigmoid(n.Outputcharge[0]);
-	n.OUTPUToutput[0] = output;
-	sigmoid(n.Outputcharge[1]);
-	n.OUTPUToutput[1] = output;
-	sigmoid(n.Outputcharge[2]);
-	n.OUTPUToutput[2] = output;
+	for (int epoch = 0; epoch < 450; epoch+=3) {
+		for (int i=0; i < 3; i++) {
+			n.Outputcharge[0] += (n.HIDDENOUTPUTARRAY[epoch+i] * n.Outputweights[i]);
+			n.Outputcharge[1] += (n.HIDDENOUTPUTARRAY[epoch+i+3] * n.Outputweights[i+3]);
+			n.Outputcharge[2] += (n.HIDDENOUTPUTARRAY[epoch+i+6] * n.Outputweights[i+6]);
+		}
+		for (int i = 0; i < 3; i++) {
+			n.Outputcharge[i] = n.Outputcharge[i] - n.thetas[i+3];
+		}
+		// OUTPUT of OUTPUT Layer neurons (tilda y)
+		for (int i = 0; i < 3; i++) {
+			sigmoid(n.Outputcharge[i]);
+			n.OUTPUToutput[counter] = output;
+			counter++;
+		}
+		//spit out our charges
+		for (int i=0; i < 3; i++)
+			cout << "OUTPUT CHARGES: " << n.Outputcharge[i] << " ";
+		cout << endl;
+		n.Outputcharge[0] = 0;
+		n.Outputcharge[1] = 0;
+		n.Outputcharge[2] = 0;
+	}  // end of epoch.	
 	
-	cout << "->OUTPUTlayer Charges: " << n.Outputcharge[0] << "2: " << n.Outputcharge[1] << "3: " << n.Outputcharge[2] << endl;
-	for (int i=0; i < 3; i++)
-		cout << "Out.Layer outputs: " << n.OUTPUToutput[i] << endl;
-
+	// spit out our Output of the OUTPUT LAYER (tilda y)	
+	for (int i=0; i < 450; i++) {
+		if (i % 3 == 0) {
+			cout << endl;
+			cout << "---------" << endl;
+		}
+		cout << "OUTPUT outputs: " << n.OUTPUToutput[i] << endl;
+	} 
+	cout << "-- End of OUTPUT  Layer --" << endl << endl;
+		
 	//calculate error e = (Yd - tilay), then Delta = y*(1 - y)*(e)
 	for (int i=0; i < 3; i++)
 		n.Output_errors[i] = n.labels[0][i] - n.OUTPUToutput[i];
@@ -194,11 +218,6 @@ int main() {
 	for (int i=0; i < 3; i++)
 			cout << "errors(e) " << n.Output_errors[i] << endl;
 
-	//cout << "First Feature row: " << n.feature[0][0] << n.feature[0][1] << n.feature[0][2] << n.feature[0][3] << endl;
-
-	//n.charge = 50.5;
-	//sigmoid(50.4);
-	//cout << "After Signoid call, Output is: " << output << endl;    
 
     return 0;
 }
