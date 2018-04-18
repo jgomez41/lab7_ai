@@ -199,14 +199,16 @@ int main() {
 	} */
 	cout << "-- End of OUTPUT  Layer --" << endl << endl;
 	counter = 0;
+		/* END OF OUTPUT LAYER */
 
 	//calculate error e = (Yd - tilay), then Delta = y*(1 - y)*(e)
 	for (int i=0; i < 150; i++) {
 		for (int j=0; j < 3; j++) {
-			n.Output_errors[counter] = n.labels[i][j] - n.OUTPUToutput[j];
+			n.Output_errors[counter] = n.labels[i][j] - n.OUTPUToutput[counter];
 			counter++;
 		}	
 	}
+
 	counter = 0;
 	for (int i=0; i < 3; i++)
 			cout << "errors(e) " << n.Output_errors[i] << endl;
@@ -214,12 +216,19 @@ int main() {
 	// Now, after (e), we calc. Delta = y*(1 - y)*(e)
 	for (int i=0; i < 150; i++) {
 		for (int j=0; j < 3; j++) {
-			// progress	
+			n.Output_deltas[counter] = n.OUTPUToutput[counter] * (1 - n.OUTPUToutput[counter]) *
+					n.Output_errors[counter];
+			counter++;
 		}
 	}
-	
+	counter = 0;
+	cout << endl << "-- End of Output Deltas --" << endl;
 
-
+	// Spit out our Delta values for the Output Layer's Neurons.
+	for (int i=0; i < 450; i++)
+		cout << "Delta[" << i << "] = " << n.Output_deltas[i] << endl;
+	cout << "Done with Output Layer's Deltas" << endl;
+	//------  END OF FEED-FORWARD. ------//
 
 
     return 0;
