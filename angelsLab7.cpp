@@ -30,11 +30,13 @@ class Neuron {
 			float feature[150][4];
 			float labels[150][3];
 			float HIDDENOUTPUTARRAY[450];
-			float Output_errors[3];
+			float Output_errors[450];
 			float Hiddenweights[12];
 			float Outputweights[9];
 			float thetas[6];
-			float delta[6];
+			float Output_deltas[450];
+			float Hidden_deltas[450];
+			
 			float charge,y,gain,wgain; //gain = -1 (bias). wgain = theta
 			float Hiddencharge[3]; //, Hiddencharge2,Hiddencharge3;
 			float Outputcharge[3]; //1, Outputcharge2,Outputcharge3;
@@ -64,22 +66,8 @@ int main() {
     srand(unsigned(time(NULL)));
     //float data[100][4];
 	//double perc = 0.0;
-    float value[5];
-    char buff[80];
     int col = 0;
     int row = 0;
-    //int y = 0;
-	int success = 0;
-    int yd;
-    int error;
-    //double charge = 0;
-    double learningRate = 0.05;
-    //double weight[3];
-    //weight[0] = ((double)rand()/(RAND_MAX)) - .5;
-    //weight[1] = ((double)rand()/(RAND_MAX)) - .5;
-    //weight[2] = ((double)rand()/(RAND_MAX)) - .5;
-    double theta = ((double)rand()/(RAND_MAX)) - .5;
-	float alpha = 0.05;
 
 	// Initialize which file we're going to read in	
 	//ifstream file( "setosa_v_versicolor.csv" );
@@ -153,9 +141,9 @@ int main() {
 			counter++;
 		}
 		//spit out our charges
-		for (int i=0; i < 3; i++)
-			cout << "Hidden Charges: " << n.Hiddencharge[i] << " ";
-		cout << endl ; 
+		/*for (int i=0; i < 3; i++)
+			cout << "Hidden Charges: " << n.Hiddencharge[i] << " ";*/
+		//cout << endl ; 
 		n.Hiddencharge[0] = 0;
 		n.Hiddencharge[1] = 0;
 		n.Hiddencharge[2] = 0;
@@ -163,13 +151,13 @@ int main() {
 	/*---- FINISHED WITH THE HIDDEN LAYER -----*/
 		
 	// spit out hidden layer outputs	
-		for (int i=0; i < 450; i++) {
+		/*for (int i=0; i < 450; i++) {
 			if (i % 3 == 0) {
 				cout << endl;
 				cout << "---------" << endl;
 			}
 			cout << "Hidden outputs: " << n.HIDDENOUTPUTARRAY[i] << endl;
-		} 
+		} */
 		cout << "-- End of Hidden Layer --" << endl << endl;
 	
 	// reset Global Counter
@@ -193,30 +181,45 @@ int main() {
 			counter++;
 		}
 		//spit out our charges
-		for (int i=0; i < 3; i++)
-			cout << "OUTPUT CHARGES: " << n.Outputcharge[i] << " ";
-		cout << endl;
+		/*for (int i=0; i < 3; i++)
+			cout << "OUTPUT CHARGES: " << n.Outputcharge[i] << " "; */
+		//cout << endl;
 		n.Outputcharge[0] = 0;
 		n.Outputcharge[1] = 0;
 		n.Outputcharge[2] = 0;
 	}  // end of epoch.	
 	
 	// spit out our Output of the OUTPUT LAYER (tilda y)	
-	for (int i=0; i < 450; i++) {
+	/*for (int i=0; i < 450; i++) {
 		if (i % 3 == 0) {
 			cout << endl;
 			cout << "---------" << endl;
-		}
-		cout << "OUTPUT outputs: " << n.OUTPUToutput[i] << endl;
-	} 
+		} 
+		//cout << "OUTPUT outputs: " << n.OUTPUToutput[i] << endl;
+	} */
 	cout << "-- End of OUTPUT  Layer --" << endl << endl;
-		
-	//calculate error e = (Yd - tilay), then Delta = y*(1 - y)*(e)
-	for (int i=0; i < 3; i++)
-		n.Output_errors[i] = n.labels[0][i] - n.OUTPUToutput[i];
+	counter = 0;
 
+	//calculate error e = (Yd - tilay), then Delta = y*(1 - y)*(e)
+	for (int i=0; i < 150; i++) {
+		for (int j=0; j < 3; j++) {
+			n.Output_errors[counter] = n.labels[i][j] - n.OUTPUToutput[j];
+			counter++;
+		}	
+	}
+	counter = 0;
 	for (int i=0; i < 3; i++)
 			cout << "errors(e) " << n.Output_errors[i] << endl;
+
+	// Now, after (e), we calc. Delta = y*(1 - y)*(e)
+	for (int i=0; i < 150; i++) {
+		for (int j=0; j < 3; j++) {
+			// progress	
+		}
+	}
+	
+
+
 
 
     return 0;
